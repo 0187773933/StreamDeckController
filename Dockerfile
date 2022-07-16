@@ -7,7 +7,9 @@ RUN apt-get install build-essential -y
 RUN apt-get install net-tools -y
 RUN apt-get install python3-pip -y
 RUN apt-get install python3-dev -y
-RUN apt-get install libssl-dev -y
+#RUN apt-get install libssl1.1="3.0.2-0ubuntu1.1" -y
+#RUN apt-get install -f
+#RUN apt-get install libssl-dev -y
 RUN apt-get install libffi-dev -y
 RUN apt-get install cargo -y
 #RUN apt-get install libmagic1 -y
@@ -28,7 +30,7 @@ RUN apt-get install libc6-dev -y
 RUN apt-get install zlib1g-dev -y
 RUN apt-get install libsqlite3-dev -y
 RUN apt-get install tk-dev -y
-RUN apt-get install libssl-dev -y
+#RUN apt-get install libssl-dev -y
 RUN apt-get install openssl -y
 RUN apt-get install libffi-dev -y
 RUN apt-get install libbz2-dev -y
@@ -38,7 +40,7 @@ RUN apt-get install libncurses5-dev -y
 RUN apt-get install xz-utils -y
 RUN apt-get install tk-dev -y
 RUN apt-get install libxml2-dev -y
-RUN apt-get install libxmlsec1-dev -y
+#RUN apt-get install libxmlsec1-dev -y
 RUN apt-get install liblzma-dev -y
 RUN apt-get install libatlas-base-dev -y
 RUN apt-get install libopenjp2-7 -y
@@ -102,8 +104,10 @@ RUN python -m pip install PyNaCl -U
 RUN python -m pip install python-ulid -U
 RUN python -m pip install pillow -U
 RUN python -m pip install streamdeck -U
+RUN python -m pip install python-box -U
+RUN python -m pip install stackprinter -U
 
 COPY . /home/$USERNAME/
 
-ENTRYPOINT [ "/bin/bash" ]
-#ENTRYPOINT [ "python" , "server.py" ]
+#ENTRYPOINT [ "/bin/bash" ]
+ENTRYPOINT [ "python" , "stream_deck_mini.py" ]

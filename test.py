@@ -8,29 +8,15 @@ from box import Box
 import requests
 from datetime import datetime
 
-from pylgtv import WebOsClient
-from wakeonlan import send_magic_packet
-
 from PIL import Image , ImageDraw , ImageFont
 from StreamDeck.DeviceManager import DeviceManager
 from StreamDeck.ImageHelpers import PILHelper
-
-import yaml # pip install pyyaml
-
-def write_yaml( file_path , python_object ):
-	with open( file_path , 'w' , encoding='utf-8' ) as f:
-		yaml.dump( python_object , f )
-
-def read_yaml( file_path ):
-	with open( file_path ) as f:
-		return yaml.safe_load( f )
 
 # https://python-elgato-streamDECK.readthedocs.io/en/stable/pages/backend_libusb_hidapi.html
 # https://python-elgato-streamDECK.readthedocs.io/en/stable/examples/basic.html
 class StreamDeckMini:
 	def __init__( self , config={} ):
 		self.config = Box( config )
-
 		self.DECK = False
 		self.buttons = {}
 		self.total_added_buttons = 0
@@ -58,17 +44,6 @@ class StreamDeckMini:
 		self.DECK.reset()
 		self.DECK.close()
 		sys.exit( 0 )
-
-	# def setup_tv( self ):
-	# 	try:
-	# 		send_magic_packet( self.config.tv.mac_address )
-	# 		webos_client = WebOsClient( self.config.tv.ip )
-	# 		webos_client.set_input( "HDMI_1" )
-	# 		webos_client.set_volume( 11 )
-	# 		return True
-	# 	except Exception as e:
-	# 		print( e )
-	# 		return False
 
 	def find_devices( self ):
 		self.devices = {}
@@ -123,8 +98,8 @@ class StreamDeckMini:
 					remaining_milliseconds = ( self.buttons[ button_index ].cooldown_milliseconds - duration_milliseconds )
 					print( f"\nDeck { self.DECK.id() } : Button [ { button_index + 1 } ] === Trigger On : [ { self.buttons[ button_index ].trigger_on } ] === Still inside Cooldown Window , [ {remaining_milliseconds} ] milliseconds remaining" , flush=True )
 					return False
+
 			print( f"\nDeck { self.DECK.id() } : Button [ { button_index + 1 } ] === Trigger On : [ { self.buttons[ button_index ].trigger_on } ] === {self.buttons[ button_index ].end_point_url}" , flush=True )
-			# self.setup_tv()
 			response = requests.get( self.buttons[ button_index ].end_point_url )
 			response.raise_for_status()
 			print( response.status_code )
@@ -182,7 +157,7 @@ class StreamDeckMini:
 
 	def start( self ):
 		# https://python-elgato-streamdeck.readthedocs.io/en/stable/modules/transports.html#StreamDeck.Transport.Transport.Transport.Device.connected
-		# could change everything here to
+		#could change everything here to
 		while self.DECK.connected() == True:
 			print( "device is still connected , sleeping for 30 seconds on the main thread" )
 			time.sleep( 30 )
@@ -198,14 +173,30 @@ class StreamDeckMini:
 		# 	except RuntimeError:
 		# 		pass
 
-def _run( config ):
+def _run():
+	# connected = False
+	# while connected == False:
+	# 	try:
+	# 		x = StreamDeckMini({
+	# 			 "serial_number": "BL12K1B42830" ,
+	# 			"brightness": 30 ,
+	# 			"global_cooldown_milliseconds": 1000
+	# 		})
+	# 		connected = True
+	# 	except Exception as e:
+	# 		print( "no devices , sleeping for 30 seconds" )
+	# 		time.sleep( 30 )
 
 	x = StreamDeckMini({
-		"serial_number": config.serial_number ,
-		"brightness": config.brightness ,
-		"global_cooldown_milliseconds": config.global_cooldown_milliseconds
+		#"serial_number": "BL12K1B42830" ,
+		"serial_number": "AL02K2C02319" ,
+		"brightness": 30 ,
+		"global_cooldown_milliseconds": 1000
 	})
 
+	# endpoint_hostname = "https://buttons.olahmb.com"
+	endpoint_hostname = "http://localhost:9371"
+	endpoint_token = "x=q27f2854ae49b194c34ced0fa0787d4047885e2bca4350f895279fbab38b"
 	x.add_button({
 		"index": 0 ,
 		"image_path": "./icons/spotify.png" ,
@@ -215,7 +206,7 @@ def _run( config ):
 		"fill": "white" ,
 		"cooldown_milliseconds": 1000 ,
 		"trigger_on": "press" , # or release
-		"end_point_url": f"{config.endpoint_hostname}/streamdeck/1?{config.endpoint_token}"
+		"end_point_url": f"{endpoint_hostname}/streamdeck/1?{endpoint_token}"
 	})
 	x.add_button({
 		"index": 1 ,
@@ -226,7 +217,7 @@ def _run( config ):
 		"fill": "white" ,
 		"cooldown_milliseconds": 1000 ,
 		"trigger_on": "press" , # or release
-		"end_point_url": f"{config.endpoint_hostname}/streamdeck/2?{config.endpoint_token}"
+		"end_point_url": f"{endpoint_hostname}/streamdeck/2?{endpoint_token}"
 	})
 	x.add_button({
 		"index": 2 ,
@@ -237,7 +228,7 @@ def _run( config ):
 		"fill": "white" ,
 		"cooldown_milliseconds": 1000 ,
 		"trigger_on": "press" , # or release
-		"end_point_url": f"{config.endpoint_hostname}/streamdeck/3?{config.endpoint_token}"
+		"end_point_url": f"{endpoint_hostname}/streamdeck/3?{endpoint_token}"
 	})
 	x.add_button({
 		"index": 3 ,
@@ -248,7 +239,7 @@ def _run( config ):
 		"fill": "white" ,
 		"cooldown_milliseconds": 1000 ,
 		"trigger_on": "press" , # or release
-		"end_point_url": f"{config.endpoint_hostname}/streamdeck/4?{config.endpoint_token}"
+		"end_point_url": f"{endpoint_hostname}/streamdeck/4?{endpoint_token}"
 	})
 	x.add_button({
 		"index": 4 ,
@@ -259,7 +250,7 @@ def _run( config ):
 		"fill": "white" ,
 		"cooldown_milliseconds": 1000 ,
 		"trigger_on": "press" , # or release
-		"end_point_url": f"{config.endpoint_hostname}/streamdeck/5?{config.endpoint_token}"
+		"end_point_url": f"{endpoint_hostname}/streamdeck/5?{endpoint_token}"
 	})
 	x.add_button({
 		"index": 5 ,
@@ -270,17 +261,17 @@ def _run( config ):
 		"fill": "white" ,
 		"cooldown_milliseconds": 1000 ,
 		"trigger_on": "press" , # or release
-		"end_point_url": f"{config.endpoint_hostname}/streamdeck/6?{config.endpoint_token}"
+		"end_point_url": f"{endpoint_hostname}/streamdeck/6?{endpoint_token}"
 	})
 	x.start()
 
 
 if __name__ == "__main__":
-	config = Box( read_yaml( "./config.yaml" ) )
 	while True:
 		try:
-			_run( config )
+			_run()
 		except Exception as e:
 			# print( stackprinter.format() )
 			print( "failed to connect , trying again in 30 seconds" )
 			time.sleep( 30 )
+

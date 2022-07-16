@@ -1,0 +1,6 @@
+lsusb
+udevadm info -a -p $(udevadm info -q path -n /dev/bus/usb/001/006)
+echo 'SUBSYSTEMS=="usb", ATTRS{product}=="Stream Deck", GROUP="sudo"' | sudo tee -a /etc/udev/rules.d/10-local.rules
+sudo udevadm control --reload-rules
+SUBSYSTEMS=="usb", ATTRS{product}=="Stream Deck",MODE="0666",TAG+="uaccess",GROUP="sudo",ENV{ID_MM_DEVICE_IGNORE}="1"
+sudo udevadm test /devices/platform/soc/3f980000.usb/usb1/1-1/1-1.3
